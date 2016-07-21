@@ -7,6 +7,25 @@
     <result column="password" property="password" jdbcType="VARCHAR" />
     <result column="age" property="age" jdbcType="INTEGER" />
   </resultMap>
+  
+  <resultMap id="UHResultMap" type="com.sunguanjun.pojo.UserHobby" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="hobby" property="hobbyName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- 一对多查询 -->
+   <resultMap id="UH2ResultMap" type="com.sunguanjun.pojo.UserHobby2" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    
+    <collection property="hobbies" ofType="com.sunguanjun.pojo.Hobby">
+    	<id column="h_id" property="id" jdbcType="INTEGER" />
+    	<result column="hobby" property="hobby" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+  
+  
   <sql id="Base_Column_List" >
     id, user_name, password, age
   </sql>
@@ -79,4 +98,24 @@
       age = #{age,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  <!-- 获取用户爱好数组 -->
+   <select id="selectUserHobby" resultMap="UHResultMap" parameterType="java.lang.Integer" >
+    select  t1.id, t1.user_name, t2.hobby   from user_t as t1 right join hobby t2 on t1.id = t2.userID
+    where t1.id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 获取用户爱好对象 -->
+  <select id="selectUserHobby2" resultMap="UH2ResultMap" parameterType="java.lang.Integer" >
+    select  t1.id, t1.user_name, t2.id as h_id, t2.hobby from user_t as t1 right join hobby t2 on t1.id = t2.userID
+    where t1.id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 获取用户爱好对象 -->
+  <select id="selectUserHobby3" resultMap="UH2ResultMap" parameterType="java.lang.Integer" >
+    select  t1.id, t1.user_name, t2.id as h_id, t2.hobby from user_t as t1  
+    	right join user_hobby as t3 on t1.id = t3.user_id 
+     	left join hobby as t2 on t3.hobby_id = t2.id
+    	where t1.id = #{id,jdbcType=INTEGER}
+  </select>
 </mapper>
